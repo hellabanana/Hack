@@ -1,0 +1,175 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="RecipesModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2012" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityContainer Name="RecipesModelStoreContainer">
+    <EntitySet Name="Cooking_Method" EntityType="RecipesModel.Store.Cooking_Method" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Ingridients" EntityType="RecipesModel.Store.Ingridients" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Recipe" EntityType="RecipesModel.Store.Recipe" store:Type="Tables" Schema="dbo" />
+    <AssociationSet Name="FK__Recipe__Cook_Met__08EA5793" Association="RecipesModel.Store.FK__Recipe__Cook_Met__08EA5793">
+      <End Role="Cooking_Method" EntitySet="Cooking_Method" />
+      <End Role="Recipe" EntitySet="Recipe" />
+    </AssociationSet>
+  </EntityContainer>
+  <EntityType Name="Cooking_Method">
+    <Key>
+      <PropertyRef Name="Met_Id" />
+    </Key>
+    <Property Name="Met_Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Cooking_Order" Type="nvarchar(max)" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Ingridients">
+    <Key>
+      <PropertyRef Name="Ing_Id" />
+    </Key>
+    <Property Name="Ing_Id" Type="int" Nullable="false" />
+    <Property Name="Ing_Name" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Ing_Weight" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="ING_Price" Type="float" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Recipe">
+    <Key>
+      <PropertyRef Name="Rec_Id" />
+    </Key>
+    <Property Name="Rec_Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Rec_Name" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Ing_List" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Rec_Price" Type="float" Nullable="false" />
+    <Property Name="Cook_Met_Id" Type="int" Nullable="true" />
+    <Property Name="Rec_Pic" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Ingr_Count" Type="nvarchar(max)" Nullable="false" />
+  </EntityType>
+  <Association Name="FK__Recipe__Cook_Met__08EA5793">
+    <End Role="Cooking_Method" Type="RecipesModel.Store.Cooking_Method" Multiplicity="0..1">
+      <OnDelete Action="Cascade" />
+    </End>
+    <End Role="Recipe" Type="RecipesModel.Store.Recipe" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Cooking_Method">
+        <PropertyRef Name="Met_Id" />
+      </Principal>
+      <Dependent Role="Recipe">
+        <PropertyRef Name="Cook_Met_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+</Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="RecipesModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Cooking_Method">
+          <Key>
+            <PropertyRef Name="Met_Id" />
+          </Key>
+          <Property Name="Met_Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Cooking_Order" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Recipe" Relationship="Self.FK__Recipe__Cook_Met__08EA5793" FromRole="Cooking_Method" ToRole="Recipe" />
+        </EntityType>
+        <EntityType Name="Ingridients">
+          <Key>
+            <PropertyRef Name="Ing_Id" />
+          </Key>
+          <Property Name="Ing_Id" Type="Int32" Nullable="false" />
+          <Property Name="Ing_Name" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Ing_Weight" Type="String" Nullable="false" />
+          <Property Name="ING_Price" Type="Double" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Recipe">
+          <Key>
+            <PropertyRef Name="Rec_Id" />
+          </Key>
+          <Property Name="Rec_Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Rec_Name" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Ing_List" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Rec_Price" Type="Double" Nullable="false" />
+          <Property Name="Cook_Met_Id" Type="Int32" />
+          <NavigationProperty Name="Cooking_Method" Relationship="Self.FK__Recipe__Cook_Met__08EA5793" FromRole="Recipe" ToRole="Cooking_Method" />
+          <Property Name="Rec_Pic" Type="String" Nullable="false" />
+          <Property Name="Ingr_Count" Type="String" Nullable="false" />
+        </EntityType>
+        <Association Name="FK__Recipe__Cook_Met__08EA5793">
+          <End Role="Cooking_Method" Type="Self.Cooking_Method" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Recipe" Type="Self.Recipe" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Cooking_Method">
+              <PropertyRef Name="Met_Id" />
+            </Principal>
+            <Dependent Role="Recipe">
+              <PropertyRef Name="Cook_Met_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="Baza" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Cooking_Method" EntityType="Self.Cooking_Method" />
+          <EntitySet Name="Ingridients" EntityType="Self.Ingridients" />
+          <EntitySet Name="Recipe" EntityType="Self.Recipe" />
+          <AssociationSet Name="FK__Recipe__Cook_Met__08EA5793" Association="Self.FK__Recipe__Cook_Met__08EA5793">
+            <End Role="Cooking_Method" EntitySet="Cooking_Method" />
+            <End Role="Recipe" EntitySet="Recipe" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+    <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="RecipesModelStoreContainer" CdmEntityContainer="Baza">
+    <EntitySetMapping Name="Cooking_Method">
+      <EntityTypeMapping TypeName="IsTypeOf(RecipesModel.Cooking_Method)">
+        <MappingFragment StoreEntitySet="Cooking_Method">
+          <ScalarProperty Name="Met_Id" ColumnName="Met_Id" />
+          <ScalarProperty Name="Cooking_Order" ColumnName="Cooking_Order" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Ingridients">
+      <EntityTypeMapping TypeName="IsTypeOf(RecipesModel.Ingridients)">
+        <MappingFragment StoreEntitySet="Ingridients">
+          <ScalarProperty Name="Ing_Id" ColumnName="Ing_Id" />
+          <ScalarProperty Name="Ing_Name" ColumnName="Ing_Name" />
+          <ScalarProperty Name="Ing_Weight" ColumnName="Ing_Weight" />
+          <ScalarProperty Name="ING_Price" ColumnName="ING_Price" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Recipe">
+      <EntityTypeMapping TypeName="IsTypeOf(RecipesModel.Recipe)">
+        <MappingFragment StoreEntitySet="Recipe">
+          <ScalarProperty Name="Rec_Id" ColumnName="Rec_Id" />
+          <ScalarProperty Name="Rec_Name" ColumnName="Rec_Name" />
+          <ScalarProperty Name="Ing_List" ColumnName="Ing_List" />
+          <ScalarProperty Name="Rec_Price" ColumnName="Rec_Price" />
+          <ScalarProperty Name="Cook_Met_Id" ColumnName="Cook_Met_Id" />
+          <ScalarProperty Name="Rec_Pic" ColumnName="Rec_Pic" />
+          <ScalarProperty Name="Ingr_Count" ColumnName="Ingr_Count" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping></edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="False" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Нет" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

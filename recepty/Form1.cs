@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AngleSharp.Parser.Html;
 
 
+
 namespace recepty
 {
     public partial class Form1 : Form
@@ -41,11 +42,12 @@ namespace recepty
         public Form1()
         {
             InitializeComponent();
+            Settings.Setup();
         }
 
         private async void button1_Click(object sender, EventArgs e)
         {
-            for (int i = 100 ; i < 101; i++)
+            for (int i = blydo_BD.start_parse ; i < blydo_BD.end_parse; i++)
             {
             
                 await Task.Run(() => PageParsing(i));
@@ -63,9 +65,28 @@ namespace recepty
                     listBox1.Items.Add(k.GetAttribute("data-body"));
 
                 }
-               
+                listBox1.Items.Add(blydo_BD.Blydo_Price(blydo));
+
             }
             
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+        
+            Ingr_Parsing.Ingr.Ingr_Start_Parsing();
+           
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+           
+        }
+
+        private void button3_Click_1(object sender, EventArgs e)
+        {
+       
+               
         }
     }
 }
