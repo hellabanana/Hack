@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Text.RegularExpressions;
 using AngleSharp;
-using System.Data.Entity;
 using recepty;
+using System.Linq;
 
 namespace Ingr_Parsing
 {
@@ -46,32 +45,30 @@ namespace Ingr_Parsing
 
 
                 }
-
             }
-
             return c.Replace('.',',');
-
-
         }
       private static string DownloadPage(string url)
         {
-           
             var client = new HttpClient();
             HttpResponseMessage response = client.GetAsync(url).Result;
             HttpContent content = response.Content;
             string reply = content.ReadAsStringAsync().Result;          
             return reply;
         }
-      public static  void Ingr_Start_Parsing() { 
+      public static  void Ingr_Start_Parsing() {
+            #region переменные
             HashSet<string> gg = new HashSet<string>();
+            Baza db = new Baza();
+            AngleSharp.Parser.Html.HtmlParser sss = new AngleSharp.Parser.Html.HtmlParser();
+            IConfiguration config = Configuration.Default.WithDefaultLoader();
+            IBrowsingContext context = BrowsingContext.New(config);
+            Ingridients[] ing = new Ingridients[gg.Count];
+            int k = 0;
+            List<Ingridients> ingridients_List = new List<Ingridients>();
+            #endregion
 
-            
 
-            var sss = new AngleSharp.Parser.Html.HtmlParser();
-
-            var config = Configuration.Default.WithDefaultLoader();
-
-            var context = BrowsingContext.New(config);
 
             for (int i = Start_blydo_number; i > End_blydo_number; i--)
             {
@@ -86,36 +83,49 @@ namespace Ingr_Parsing
                         
                     }
                 }
-                catch (Exception ex) { continue; }
+                catch (Exception ) { continue; }
+            } 
+            foreach (var item in db.Ingridients) {
+                db.Ingridients.Attach(item);
+                db.Ingridients.Remove(item);
+
             }
-
-            Baza db = new Baza();
-            Ingridients[] ing = new Ingridients[gg.Count];
-            int k = 0;
-
             foreach (var cgus in gg)
             {
 
                 try
                 {
                     var document = sss.Parse(DownloadPage(cgus));
-                    ing[k] = new Ingridients();
-                    ing[k].Ing_Name = document.QuerySelector("img.retina_redy").GetAttribute("alt");
-                    ing[k].ING_Price=double.Parse( Convert_Price( document.QuerySelector("div.price").TextContent));
-                    ing[k].Ing_Weight=     document.QuerySelector("small.kg").TextContent;
-                    ing[k].Ing_Id = k;
-                    db.Ingridients.Add(ing[k]);
+                    ingridients_List.Add(new Ingridients());
+                    ingridients_List[k].Ing_Name = document.QuerySelector("img.retina_redy").GetAttribute("alt");
+                    ingridients_List[k].ING_Price = double.Parse(Convert_Price(document.QuerySelector("div.price").TextContent));
+                    ingridients_List[k].Ing_Weight = document.QuerySelector("small.kg").TextContent;
+                    ingridients_List[k].Ing_Id = k;
                     k++;
                 }
                 catch (Exception) { continue; }
                
             }
+            var sortedList = ingridients_List.GroupBy(f => f.Ing_Name).Select(d => d.First());
+            k = 0;
+            foreach (var sorted in sortedList)
+            {
+                try
+                {
+                    if (sorted.Ing_Name != null)
+                    {
+                        ing[k] = new Ingridients();
+                        ing[k].Ing_Name = sorted.Ing_Name;
+                        ing[k].ING_Price = sorted.ING_Price;
+                        ing[k].Ing_Weight = sorted.Ing_Weight;
+                        ing[k].Ing_Id = k;
+                        db.Ingridients.Add(ing[k]);
+                        k++;
+                    }
+                }
+                catch (Exception) { continue; }
+            }
             db.SaveChanges();
-
-
-
-           
-               
             
         }
     }

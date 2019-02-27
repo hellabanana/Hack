@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace recepty
+﻿namespace recepty
 {
     class Settings
     {
@@ -13,11 +7,8 @@ namespace recepty
             blydo_BD.start_parse = 100;
             blydo_BD.end_parse = 101;
             Ingr_Parsing.Ingr.Start_blydo_number = 133;
-            Ingr_Parsing.Ingr.End_blydo_number = 130;
-
-
-
-
+            Ingr_Parsing.Ingr.End_blydo_number = 0;
+            
         }
     }
 }
