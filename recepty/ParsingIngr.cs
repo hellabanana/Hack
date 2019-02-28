@@ -4,14 +4,15 @@ using System.Net.Http;
 using AngleSharp;
 using recepty;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace Ingr_Parsing
 {
-    class Ingr
+  abstract  class Ingr
     {
       public  static int Start_blydo_number { get; set; }
       public  static int End_blydo_number { get; set; }
-      public  static string Convert_Price( string c) {
+      private  static string Convert_Price( string c) {
             unsafe {
                 fixed(char *p= c)
                 {
@@ -56,14 +57,14 @@ namespace Ingr_Parsing
             string reply = content.ReadAsStringAsync().Result;          
             return reply;
         }
-      public static  void Ingr_Start_Parsing() {
+      public static async  void Ingr_Start_Parsing(ToolStripStatusLabel toolStripStatusLabel1) {
             #region переменные
-            HashSet<string> gg = new HashSet<string>();
+            List<string> gg = new List<string>();
             Baza db = new Baza();
             AngleSharp.Parser.Html.HtmlParser sss = new AngleSharp.Parser.Html.HtmlParser();
             IConfiguration config = Configuration.Default.WithDefaultLoader();
             IBrowsingContext context = BrowsingContext.New(config);
-            Ingridients[] ing = new Ingridients[gg.Count];
+          
             int k = 0;
             List<Ingridients> ingridients_List = new List<Ingridients>();
             #endregion
@@ -82,15 +83,22 @@ namespace Ingr_Parsing
                         gg.Add(file[iss].GetAttribute("href"));
                         
                     }
+                   
+                    toolStripStatusLabel1.Text = "Обновление:"+"загрузка страниц "+  (i-1);
                 }
                 catch (Exception ) { continue; }
-            } 
+            }
+            toolStripStatusLabel1.Text = "Обновление:" + "удаление старых записей";
+            Ingridients[] ing = new Ingridients[gg.Count];
             foreach (var item in db.Ingridients) {
                 db.Ingridients.Attach(item);
                 db.Ingridients.Remove(item);
+            
 
             }
-            foreach (var cgus in gg)
+            IEnumerable<string> sorted_links = gg.GroupBy(f => f).Select(d => d.First());
+
+            foreach (var cgus in sorted_links)
             {
 
                 try
@@ -106,8 +114,9 @@ namespace Ingr_Parsing
                 catch (Exception) { continue; }
                
             }
-            var sortedList = ingridients_List.GroupBy(f => f.Ing_Name).Select(d => d.First());
+            IEnumerable<Ingridients> sortedList = ingridients_List.GroupBy(f => f.Ing_Name).Select(d => d.First());
             k = 0;
+            toolStripStatusLabel1.Text = "Обновление:" + "формирование новых данных " ;
             foreach (var sorted in sortedList)
             {
                 try
@@ -125,6 +134,7 @@ namespace Ingr_Parsing
                 }
                 catch (Exception) { continue; }
             }
+            toolStripStatusLabel1.Text = "Обновление:" + "сохранение базы";
             db.SaveChanges();
             
         }

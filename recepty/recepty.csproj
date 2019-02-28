@@ -102,6 +102,7 @@
     <Compile Include="Ingridients.cs">
       <DependentUpon>Baza2.tt</DependentUpon>
     </Compile>
+    <Compile Include="ParsingBlydo.cs" />
     <Compile Include="ParsingIngr.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -109,6 +110,7 @@
       <DependentUpon>Baza2.tt</DependentUpon>
     </Compile>
     <Compile Include="Settings.cs" />
+    <Compile Include="Vyvod_SP.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>

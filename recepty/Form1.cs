@@ -3,39 +3,15 @@ using System.Windows.Forms;
 using System.Net;
 using System.Threading.Tasks;
 using AngleSharp.Parser.Html;
-
-
+using System.Drawing;
+using System.Collections.Generic;
 
 namespace recepty
 {
     public partial class Form1 : Form
     {
-        blydo blydo = new blydo();
-
-        #region Скачивание_страницы
-        public string DownloadPage(string url) {               
-            WebClient webClient = new WebClient();
-            webClient.Encoding = System.Text.Encoding.UTF8;
-          return  webClient.DownloadString(url);
-        }
-        #endregion
-
-        #region Парсинг инфы из страницы
-        public async void PageParsing(int PageNumber) {
-            HtmlParser parser = new HtmlParser();
-            AngleSharp.Dom.Html.IHtmlDocument document = await parser.ParseAsync(DownloadPage("https://e-dostavka.by/recipe/hot/" + PageNumber + ".html"));
-            blydo.BlydoName = document.QuerySelector("div.description").TextContent; //название блюда
-           blydo.BlydoPicture = document.QuerySelector("img.retina_redy").GetAttribute("src"); //картинка
-            blydo.IngName= document.QuerySelectorAll("li.not_in_cart a");
-            blydo.Count = document.QuerySelectorAll("li.not_in_cart span");
-            blydo.BlydoSP_Picture = document.QuerySelectorAll("a.fancy_img");
-            blydo.BlydoSposobPrigotovleniya = document.QuerySelectorAll("a.fancy_img");
-
-
-
-        }
-        #endregion
-
+        List<Recipe> list_recp = new List<Recipe>();
+        int Check = 0;
         public Form1()
         {
             InitializeComponent();
@@ -44,34 +20,98 @@ namespace recepty
 
         private async void button1_Click(object sender, EventArgs e)
         {
-            for (int i = blydo_BD.start_parse ; i < blydo_BD.end_parse; i++)
+            button2.Enabled = false;
+            button3.Enabled = false;
+            list_recp.Clear();
+            
+            try
             {
-                await Task.Run(() => PageParsing(i));
-                listBox1.Items.Add(blydo.BlydoName);
-                pictureBox1.ImageLocation = blydo.BlydoPicture;
-                foreach (var k in blydo.GetIng())
+                Baza baza = new Baza();
+                int nm = 0;
+
+                Recipe recipe = new Recipe();
+                foreach (var item in baza.Recipe)
                 {
-                    listBox1.Items.Add(k);
+                    if (double.Parse(textBox1.Text) >= item.Rec_Price) { nm = item.Rec_Id; list_recp.Add(item); }
+                   
 
                 }
-                foreach (var k in blydo.BlydoSposobPrigotovleniya)
+                label1.Text = $"1/{list_recp.Count}";
+                if (nm > 0)
+
                 {
-                    listBox1.Items.Add(k.GetAttribute("data-body"));
+                    label3.Text = baza.Recipe.Find(nm).Rec_Name;
+
+                    pictureBox1.Image = Image.FromFile(baza.Recipe.Find(nm).Rec_Name + "0" + ".png");
+                    Vyvod_SP.DynamicRecepy(new System.Drawing.Point(10, 348), this, baza.Recipe.Find(nm));
+                    label2.Text = "Cтоимость: " + baza.Recipe.Find(nm).Rec_Price.ToString("F2") + " руб";
+                    button3.Enabled = true;
+
+
 
                 }
-                listBox1.Items.Add(blydo_BD.Blydo_Price(blydo));
-
-            }
+            }catch (Exception) {toolStripStatusLabel1.Text = "Ошибка!"; }
             
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private async void button2_Click(object sender, EventArgs e)
         {
-            Ingr_Parsing.Ingr.Ingr_Start_Parsing();
-           
+            try
+            {
+            //toolStripStatusLabel1.Text="Обновление ингридиентов";
+            //await Task.Run(() => Ingr_Parsing.Ingr.Ingr_Start_Parsing(toolStripStatusLabel1));
+            toolStripStatusLabel1.Text = "Обновление рецептов";
+               await Task.Run(() => ParsingBlydo.Start_Parse(toolStripStatusLabel1));
+        
+
+
+
+              
+            }catch (Exception) { toolStripStatusLabel1.Text = "Ошибка! Проверьте соединение с интернетом"; }
+
         }
 
-        
-       
+        private void button2_Click_1(object sender, EventArgs e)
+        {
+            if (Check == 0) { button2.Enabled = false; }
+            else
+            {
+
+                
+                    Check--;
+                    label1.Text = $"{Check+1}/{list_recp.Count}";
+                label3.Text = list_recp[Check].Rec_Name;
+                pictureBox1.Image = Image.FromFile(list_recp[Check].Rec_Name + "0" + ".png");
+                label2.Text = "Cтоимость: " + list_recp[Check].Rec_Price.ToString("F2") + " руб";
+                Vyvod_SP.DynamicRecepy(new System.Drawing.Point(10, 348), this, list_recp[Check]);
+                
+            
+            }
+            
+
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            Check++;
+            if (Check >= list_recp.Count) {
+                Check = 0;
+                label1.Text = $"1/{list_recp.Count}";
+                label3.Text = list_recp[Check].Rec_Name;
+                label2.Text = "Cтоимость: " + list_recp[Check].Rec_Price.ToString("F2")+" руб";
+                pictureBox1.Image = Image.FromFile(list_recp[Check].Rec_Name + "0" + ".png");
+                Vyvod_SP.DynamicRecepy(new System.Drawing.Point(10, 348), this, list_recp[0]);
+            }
+
+            else
+            {
+                label1.Text = $"{Check+1}/{list_recp.Count}";
+                button2.Enabled = true;
+                label3.Text = list_recp[Check].Rec_Name;
+                label2.Text = "Cтоимость: "+list_recp[Check].Rec_Price.ToString("F2") + " руб";
+                pictureBox1.Image = Image.FromFile(list_recp[Check].Rec_Name + "0" + ".png");
+                Vyvod_SP.DynamicRecepy(new System.Drawing.Point(10, 348), this, list_recp[Check]);
+            }
+        }
     }
 }

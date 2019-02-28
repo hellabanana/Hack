@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Windows.Forms;
 
 namespace recepty
 {
@@ -16,8 +17,8 @@ namespace recepty
         public List<string> GetIng() {
             List<string> vs = new List<string>();
             for (int i = 0; i < IngName.Length; i++) {
-
-                vs.Add(IngName[i].TextContent+" "+Count[i].TextContent);
+                
+                vs.Add(IngName[i].TextContent+" "+Count[i].TextContent +" * ");
             }
             return vs;
         }
@@ -33,22 +34,48 @@ namespace recepty
             double Summa = 0;
             System.Data.Entity.DbSet<Ingridients> ingridients = bd.Ingridients;
             List<string> List_Ing = blyd.GetIng();
+            List<string> in_Price = new List<string>();
+           
+            int Pos = 0;
             
 
             foreach (var ing in ingridients)
             {
-                for (int i = 0; i < blyd.GetIng().Count; i++)
+                
+                Pos = 0;
+                foreach (var k in in_Price) {
+                    if (k.Substring(0, 5) == ing.Ing_Name.Substring(0, 5)) { Pos++; break; }
+
+                }
+          
+
+
+
+                if (Pos == 0)
                 {
-                    if (List_Ing[i].Substring(0, 5) == ing.Ing_Name.Substring(0,5)) {
-                        Summa += ing.ING_Price;
-                        break;
+
+                    for (int i = 0; i < blyd.GetIng().Count; i++)
+                    {
+
+                        if (List_Ing[i].Substring(0, 5) == ing.Ing_Name.Substring(0, 5))
+                        {
+                            Summa += ing.ING_Price;
+                           
+                            Pos = i;
+                            in_Price.Add(List_Ing[i].Substring(0, 5));
+                            break;
+
+                        }
 
                     }
- 
                 }
-                           
-            }
-                return Summa;
+                
+                }
+
+            return Summa;
+
+        }
+               
 
         }
 
@@ -56,4 +83,4 @@ namespace recepty
 
     }
    
-}
+
